@@ -1,6 +1,8 @@
 
 import './App.css';
 import {useState, useEffect} from 'react';
+import { IoHourglassOutline } from 'react-icons/io5';
+//IoHourglassOutline
 function App() {
 
   // update meta tags 
@@ -87,7 +89,7 @@ function App() {
                 onChange={e=> setua(e.target.value)}
               />
               <br/>
-              <button onClick={onClick}>{timeLeft>0 ?timeLeft : ''} Submit</button> 
+              <button onClick={onClick}><IoHourglassOutline/>{timeLeft>0 ?timeLeft : ''} Submit</button> 
 
             </div>
           }
