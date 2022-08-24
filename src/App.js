@@ -19,6 +19,8 @@ function App() {
   var [timeLeft, setTimeLeft] = useState(10);// 20 seconds
   var [name, setName] = useState('');
   var [intervalObj, setIntervalObj] = useState(null);
+  var [rightPoints, setRightPoints] = useState(0);
+  var [wrongPoints, setWrongPoints] = useState(0);
   var [testMessage, setTestMessage] = useState('');
   // update meta tags 
   useEffect(() => {
@@ -89,8 +91,10 @@ function App() {
     console.log("inside onClick submit")
     if(ua == a){
       setm('Right');
+      setRightPoints(p => p+1);
     }else{
       setm('Wrong');
+      setWrongPoints(p => p+1);
     }
     setUserAnswered(true);
 
@@ -171,6 +175,15 @@ function App() {
       <div id="footer"
         style={{position: 'fixed', bottom: '10px', textAlign:'center', width:'100%'}}
         >
+        <div className="achievements">
+          <span className="rightPointsContainer pointsContainer">
+            Right: &nbsp; <span  class="right_points">{rightPoints}</span>
+          </span>
+          
+          <span className="wrongPointsContainer pointsContainer">
+             Wrong: &nbsp; <span class="wrong_points">{wrongPoints}</span>
+          </span>         
+        </div>
         <input type="text" 
           name="name" 
           id="name" 
