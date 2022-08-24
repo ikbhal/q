@@ -30,7 +30,7 @@ function App() {
   }
   const resetTest =() =>{
     console.log("reset test");
-    seta(false);
+    seta('20');
     setua('');
     setm('');
     setUserAnswered(false)
