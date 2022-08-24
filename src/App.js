@@ -1,7 +1,16 @@
 import logo from './logo.svg';
 import './App.css';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
 function App() {
+
+  // update meta tags 
+  useEffect(() => {
+    document.head.innerHTML+=`
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+    `
+  }, []);
+
   const onStartClick = ()=>{
     console.log("onstartclick");
     setStart(true)
