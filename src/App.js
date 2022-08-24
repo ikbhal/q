@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+
 import './App.css';
 import {useState, useEffect} from 'react';
 function App() {
@@ -55,6 +55,7 @@ function App() {
                 value={ua}
                 onChange={e=> setua(e.target.value)}
               />
+              <br/>
               <button onClick={onClick}>Submit</button> 
             </div>
           }
