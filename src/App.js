@@ -4,6 +4,7 @@ import './App.css';
 import {useState, useEffect} from 'react';
 import socketIOClient from "socket.io-client";
 import { IoHourglassOutline } from 'react-icons/io5';
+import {FiCheck, FiX} from 'react-icons/fi';
 const ENDPOINT = "http://127.0.0.1:4001";
 var socket = null;
 
@@ -177,11 +178,11 @@ function App() {
         >
         <div className="achievements">
           <span className="rightPointsContainer pointsContainer">
-            Right: &nbsp; <span  class="right_points">{rightPoints}</span>
+          <FiCheck/>&nbsp; <span  class="right_points">{rightPoints}</span>
           </span>
           
           <span className="wrongPointsContainer pointsContainer">
-             Wrong: &nbsp; <span class="wrong_points">{wrongPoints}</span>
+             <FiX/> &nbsp; <span class="wrong_points">{wrongPoints}</span>
           </span>         
         </div>
         <input type="text" 
