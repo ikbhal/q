@@ -7,7 +7,7 @@ import { IoHourglassOutline,IoArrowForwardSharp } from 'react-icons/io5';
 import {FiCheck, FiX} from 'react-icons/fi';
 import {BiPlay, BiRepeat} from 'react-icons/bi';
 import {FaSave} from 'react-icons/fa';
-import {GrNext} from 'react-icons/gr';
+// import {GrNext} from 'react-icons/gr';
 const ENDPOINT = "http://127.0.0.1:4001";
 var socket = null;
 
@@ -42,6 +42,7 @@ function App() {
     socket.on('userSet', function(data){
         console.log("inside userSet event received , data:", data);
         var user = data.username;
+        setName(user);
         setTableId(data.table.id);
         setTestMessage('username was set accepted from server is ' + user)
     });
@@ -55,8 +56,10 @@ function App() {
 
     socket.on('start_test_response', data => {
       console.log('received start test response message data,', data);
-      var table = data;
-      qres = table.question;
+      // debugger;
+      // var resp = data;'
+      // var username = data.username;
+      qres = data.question;
       var q = data.q;
       var a = data.a;
       seta(a);
@@ -71,12 +74,12 @@ function App() {
       //io.to(table.id).emit('test_status', {status: 'win', 'message': 'won', username});
       //socket.emit('test_status', {status: 'lose', 'message': 'right but slow'})
 
-      var status = data.status;
+      // var status = data.status;
       var message = data.message;
       var username = 'username' in data ? data.username : '';
 
       var testStatusMessage = "";
-      if(username == name){
+      if(username === name){
         // same user  -> mostly win
         testStatusMessage = message;
       }else {
@@ -91,7 +94,7 @@ function App() {
       console.log("leave_table_response client callback data:", data);
       // io.to(table.id).emit('leave_table_response', {message:"left table", username})
       var username = data.username;
-      var message = message;
+      // var message = data.message;
 
       var testMesage = username + " left  table";
       setTestMessage(testMesage);
@@ -140,8 +143,9 @@ function App() {
   }
   const onSubmit= () =>{
     console.log("inside onClick submit")
+    debugger;
     socket.emit('test_complete', {ua, q, username:name});
-    if(ua == a){
+    if(ua === a){
       setm('Right');
       setRightPoints(p => p+1);
       
@@ -274,6 +278,7 @@ function App() {
         <input type="text" 
           name="name" 
           id="name" 
+          value={name}
           onChange = {e => setName(e.target.value)}
           placeholder="Enter name"/>
 
