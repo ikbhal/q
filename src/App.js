@@ -3,8 +3,11 @@
 import './App.css';
 import {useState, useEffect} from 'react';
 import socketIOClient from "socket.io-client";
-import { IoHourglassOutline } from 'react-icons/io5';
+import { IoHourglassOutline,IoArrowForwardSharp } from 'react-icons/io5';
 import {FiCheck, FiX} from 'react-icons/fi';
+import {BiPlay, BiRepeat} from 'react-icons/bi';
+import {FaSave} from 'react-icons/fa';
+import {GrNext} from 'react-icons/gr';
 const ENDPOINT = "http://127.0.0.1:4001";
 var socket = null;
 
@@ -23,6 +26,9 @@ function App() {
   var [rightPoints, setRightPoints] = useState(0);
   var [wrongPoints, setWrongPoints] = useState(0);
   var [testMessage, setTestMessage] = useState('');
+  var [tableId, setTableId] = useState('');
+  var [tableMembers, setTableMembers] = useState([]);
+
   // update meta tags 
   useEffect(() => {
     document.head.innerHTML+=`
@@ -34,13 +40,23 @@ function App() {
       setTestMessage(data);
     });
     socket.on('userSet', function(data){
+        console.log("inside userSet event received , data:", data);
         var user = data.username;
+        setTableId(data.table.id);
         setTestMessage('username was set accepted from server is ' + user)
     });
 
+    socket.on('member_updated', (table) =>{
+      console.log("inside member_update event received table:",table);
+      // if(table.id == tableId){ // only for our table, others ignore, backend change todo
+        setTableMembers([...table.members ])
+      // }
+    })
+
     socket.on('start_test_response', data => {
       console.log('received start test response message data,', data);
-      qres = data;
+      var table = data;
+      qres = table.question;
       var q = data.q;
       var a = data.a;
       seta(a);
@@ -49,6 +65,20 @@ function App() {
       resetTest();
       startTest();
     });
+
+    socket.on('test_status', data =>{
+      console.log('Inside test_status event received client callback data:', data);
+      //io.to(table.id).emit('test_status', {status: 'win', 'message': 'won', username});
+      //socket.emit('test_status', {status: 'lose', 'message': 'right but slow'})
+
+      var status = data.status;
+      var message = data.message;
+      var username = 'username' in data ? data.username : '';
+
+      setTestMessage(message);
+
+    });
+      
 
   }, []);
 
@@ -67,6 +97,8 @@ function App() {
           clearInterval(iob);
           return iob;
         })
+
+        socket.emit('test_complete', {timeout:true, q, username:name});
         return 0;
       }
       return t;
@@ -76,7 +108,7 @@ function App() {
   const onStartClick = ()=>{
     console.log("onstartclick");
    
-    socket.emit('start_test');
+    socket.emit('start_test', name);
   }
 
   const startTest = () =>{
@@ -90,9 +122,11 @@ function App() {
   }
   const onSubmit= () =>{
     console.log("inside onClick submit")
+    socket.emit('test_complete', {ua, q, username:name});
     if(ua == a){
       setm('Right');
       setRightPoints(p => p+1);
+      
     }else{
       setm('Wrong');
       setWrongPoints(p => p+1);
@@ -150,7 +184,8 @@ function App() {
       <div id="test-message">
         {testMessage}
       </div>
-      {!isStarted && <button onClick={onStartClick}>Start</button>}
+      
+      {!isStarted && <button onClick={onStartClick}><BiPlay/>Start</button>}
       {isStarted && 
         <div className="q">
           <h1>Q</h1>
@@ -168,21 +203,37 @@ function App() {
 
             </div>
           }
-          { isUserAnswered && <button onClick={onTryAgain}>Try Again</button>}
-          <button onClick={nextQuestion}>Next Q</button>
+          { isUserAnswered && <button onClick={onTryAgain}>
+            {/* Try Again */}
+            <BiRepeat/>
+          </button>}
+          <button onClick={nextQuestion}>
+            {/* Next Q */}
+            {/* <GrNext/> */}
+            <IoArrowForwardSharp/>
+            </button>
         </div>
       }
 
       <div id="footer"
         style={{position: 'fixed', bottom: '10px', textAlign:'center', width:'100%'}}
         >
+        <div className="table">
+          Table id : <span className="tableid">{tableId}</span> <br/>
+          <div className="table-members">
+            Members: 
+            {tableMembers.map((m, index) => 
+                <span key={index} className="table_member">{m.username}</span>
+            )}
+          </div>
+        </div>
         <div className="achievements">
           <span className="rightPointsContainer pointsContainer">
-          <FiCheck/>&nbsp; <span  class="right_points">{rightPoints}</span>
+          <FiCheck/>&nbsp; <span  className="right_points">{rightPoints}</span>
           </span>
           
           <span className="wrongPointsContainer pointsContainer">
-             <FiX/> &nbsp; <span class="wrong_points">{wrongPoints}</span>
+             <FiX/> &nbsp; <span className="wrong_points">{wrongPoints}</span>
           </span>         
         </div>
         <input type="text" 
@@ -195,7 +246,7 @@ function App() {
           e => {
             sendNameToSever(name)
           }
-        }>Set Name</button>
+        }><FaSave /></button>
       </div>
     </div>
   );
