@@ -75,8 +75,26 @@ function App() {
       var message = data.message;
       var username = 'username' in data ? data.username : '';
 
-      setTestMessage(message);
+      var testStatusMessage = "";
+      if(username == name){
+        // same user  -> mostly win
+        testStatusMessage = message;
+      }else {
+        testStatusMessage = "You lose the game";
+      }
+      setTestMessage(testStatusMessage);
 
+    });
+
+    //leave_table_response
+    socket.on('leave_table_response', (data) =>{
+      console.log("leave_table_response client callback data:", data);
+      // io.to(table.id).emit('leave_table_response', {message:"left table", username})
+      var username = data.username;
+      var message = message;
+
+      var testMesage = username + " left  table";
+      setTestMessage(testMesage);
     });
       
 
@@ -179,6 +197,15 @@ function App() {
     console.log("next question");
     socket.emit('start_test');   
   }
+
+  const leaveTable = () =>{
+    console.log("inside leave table");
+    socket.emit('leave_table', {username:name});
+  }
+
+  const leaveAndJoinNewTable = () =>{
+    socket.emit('leave_and_join_new_table', {username: name});
+  }
   return (
     <div className="App">
       <div id="test-message">
@@ -226,6 +253,14 @@ function App() {
                 <span key={index} className="table_member">{m.username}</span>
             )}
           </div>
+          <button className="leave-table" 
+            onClick={leaveTable}>
+            Leave Table
+          </button>
+          <button className="leave-table" 
+            onClick={leaveAndJoinNewTable}>
+            Leave and Join new Table
+          </button>
         </div>
         <div className="achievements">
           <span className="rightPointsContainer pointsContainer">
